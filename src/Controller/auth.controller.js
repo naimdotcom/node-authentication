@@ -2,8 +2,8 @@ const { ApiResponse, ApiError } = require("../utils/ApiResponse");
 const User = require("../Model/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { hashPassword, comparePassword } = require("../Helper/bcrypt");
-const { generateToken } = require("../Helper/Jwt");
+const { hashPassword, comparePassword } = require("../lib/bcrypt");
+const { generateToken } = require("../lib/Jwt");
 
 const CreateUser = async (req, res) => {
   try {
@@ -72,23 +72,26 @@ const loginUser = async (req, res) => {
       process.env.JWT_SECRET_EXPIRY_OTP
     );
 
-    return res
-      .status(200)
-      .json(
-        new ApiResponse(200, "User login successfully", {
-          token: `Bearer ${token}`,
-        })
-      )
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-      });
+    res.cookie("edit_token_name", token, {
+      httpOnly: true,
+      secure: true,
+    });
+    return res.status(200).json(
+      new ApiResponse(200, "User login successfully", {
+        token: `Bearer ${token}`,
+      })
+    );
   } catch (error) {
     console.log("error while login user: ", error);
     return res.status(500).json(new ApiError(500, "Internal server error"));
   }
 };
 
+const verifyOtp = async (req, res) => {};
+
+const resetOtp = async (req, res) => {};
+
 module.exports = {
   CreateUser,
+  loginUser,
 };
